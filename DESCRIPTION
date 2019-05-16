@@ -1,0 +1,13 @@
+Package: purrrogress
+Title: What the Package Does (One Line, Title Case)
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Andrew",
+           family = "Redd",
+           role = c("aut", "cre"),
+           email = "andrew.redd@hsc.utah.edu",
+           comment = c(ORCID = "0000-0002-6149-2438"))
+Description: Easy progress bars for apply functions
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
