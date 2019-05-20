@@ -23,3 +23,5 @@ RoxygenNote: 6.1.1
 Language: en-US
 Suggests: 
     testthat
+URL: https://github.com/halpo/purrrogress
+BugReports: https://github.com/halpo/purrrogress/issues
