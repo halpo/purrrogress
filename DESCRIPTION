@@ -21,12 +21,14 @@ Imports:
     pkgcond, 
     purrr,
     testextra,
-    utils
+    utils, 
+    rlang
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.1
 Language: en-US
-Suggests: 
-    testthat,
-    covr
+Suggests:
+    covr,
+    dplyr,
+    testthat
 URL: https://github.com/halpo/purrrogress
 BugReports: https://github.com/halpo/purrrogress/issues

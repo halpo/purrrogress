@@ -24,8 +24,20 @@ if(FALSE){
 
     eval(quote(length(..1)), envir=frame)
 }
+get_call_symbol <- function(call){
+    if(is.symbol(call)) return(deparse(call))
+    if(is.call(call)){
+        if ( length(call) == 3
+          && is.name(call[[1]])
+          && call[[1]] == '::')
+            return(get_call_symbol(call[[3]]))
+        else return(get_call_symbol(call[[1]]))
+    }
+    return(NA_character_)
+}
+
 get_call_symbols <- function(calls = sys.calls()){
-    purrr::map_chr( calls, ~head(deparse(.[[1L]]), 1L))
+    purrr::map_chr(calls, get_call_symbol)
 }
 
 base.apply.calls <- c('mapply', 'apply', 'sapply', 'tapply', 'lapply')
@@ -48,9 +60,8 @@ function( i = in_apply_call()
 
 }
 
-
 with_apply_progress <-
-function(i = in_apply_call(), ..., fun){
+function(i = in_apply_call(), title=NULL, ..., fun){
     total <- get_apply_length(i)
     stack <- get_progress_stack("with_progress", "environment")
     set_progress_stack("with_progress", stack)
@@ -64,12 +75,19 @@ function(i = in_apply_call(), ..., fun){
             title <- paste(sQuote(call[[1]]), "progress")
         }
     }
-    pb <- progress_bar(total = total, ...)
+    pb <- progress_bar(total = total, title=title, ...)
     push_progress(pb, 'with_progress')
     function(...){
         pb$update()
         on.exit(pb$step())
         fun(...)
     }
+}
+if(FALSE){#@testing
+    val <- sapply( 1:5, with_progress( test_progress_status, type="none")
+                 , total=5
+                 , title = "sapply"
+                 , label = "\\d/5 items completed")
+    expect_true(all(val))
 }
 

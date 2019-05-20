@@ -73,15 +73,17 @@ R6_progress <- R6::R6Class("R6 Progress Base Class",
                        , rlang::is_string(name)
                        , is.flag(overwrite)
                        )
-            if ( name %in% ls(self, all=TRUE)
-               | name %in% ls(private$bindings, all=TRUE)
+            if ( name %in% ls(self, all.names = TRUE)
+               | name %in% ls(private$bindings, all.names = TRUE)
                ) {
                 if (isFALSE(overwrite))
-                    pkg_error(sQuote(name) %<<% "already exists.")
+                    pkg_error( sQuote(name) %<<% "already exists."
+                             , type = "already-exists")
                 if (is.na(overwrite))
                     pkg_warning(sQuote(name) %<<% "already exists." %<<%
-                                "Overwriting previous value.")
-                if (name %in% ls(private$bindings, all=TRUE))
+                                "Overwriting previous value."
+                               , type = "already-exists")
+                if (name %in% ls(private$bindings, all.names = TRUE))
                     rm(list=name, envir = private$bindings)
             }
             makeActiveBinding(name, fun, private$bindings)
@@ -90,7 +92,7 @@ R6_progress <- R6::R6Class("R6 Progress Base Class",
         add_bindings = function(..., overwrite=NA){
             private$.add_bindings(list(...), overwrite=overwrite)
         },
-        expose = function(..., env=parent.frame(), .overwrite=NA){
+        expose = function(..., env=parent.frame(), overwrite=NA){
             c <- rlang::ensyms(...)
             assert_that(all(map_lgl(c, is.symbol)))
             names(c) <- ifelse(nchar(names(c)) > 0, names(c), as.character(c))
@@ -136,11 +138,11 @@ R6_progress <- R6::R6Class("R6 Progress Base Class",
         },
         .expose = function(var, name, env, overwrite=NA){
             fun <- eval(substitute(function()var, list(var=var)), env)
-            self$.add_binding(fun, name, .overwrite=.overwrite)
+            self$add_binding(fun, name, overwrite=overwrite)
         }
     )}
 )
-if(FALSE){
+if(FALSE){#@testing
     test <- R6_progress$new(100)
 
     expect_equal(test$title, "Progress")
@@ -158,13 +160,14 @@ if(FALSE){
     words <- stringi::stri_rand_lipsum(1, FALSE) %>%
              stringi::stri_split(fixed = ' ') %>%
              unlist()
+    i <- 1
     pb <-
         R6_progress$new( length(words)
                        , "Test Progress {current}/{total} ({estimated.time.remaining} remaining.)"
                        , "{elapsed.time}/{estimated.total.time} estimated.\n {word}"
                        , bindings = list(word = ~words[i])
+                       , expose = 'i'
                        )
-    i <- 1
 
     expect_identical(pb$total, length(words))
     expect_identical(pb$current, 0L)
@@ -176,12 +179,28 @@ if(FALSE){
     Sys.sleep(1)
     et <- pb$elapsed.time
     expect_is(et, 'hms')
-    expect_true(et==1)
+    expect_true(et >= 1)
+
+    at <- pb$average.time
+    expect_is(at, 'hms')
+    expect_true(at >= 1)
+
+    expect_equal(pb$percent, "1%")
+
+    expect_error(pb$expose(i, overwrite = FALSE)
+                , class = "purrrogress-error-already-exists")
+    expect_warning(pb$expose(i, overwrite = NA)
+                  , class = "purrrogress-warning-already-exists")
+    expect_silent(pb$expose(i, overwrite = TRUE))
+
+    pb$add_bindings(next_word = function()words[[pb$current+2]])
+
 
 }
 
 
 # R6 Windows Progress Bar ==============================================
+# nocov start
 R6_win_progress <- R6::R6Class("R6 Windows Progress Bar",
     inherit = R6_progress,
     public  = list(
@@ -258,9 +277,10 @@ R6_win_progress <- R6::R6Class("R6 Windows Progress Bar",
         .final.= "Finalizing"
     )
 )
+# nocov end
 
 # Testing --------------------------------------------------------------
-if(FALSE){
+if(FALSE){#@ testing
     words <- stringi::stri_rand_lipsum(1, FALSE) %>%
              stringi::stri_split(fixed = ' ') %>%
              unlist()
