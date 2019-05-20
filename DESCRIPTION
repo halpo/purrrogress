@@ -11,3 +11,14 @@ Description: Easy progress bars for apply functions
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+Imports: 
+    R6, 
+    glue,
+    pkgcond, 
+    hms,
+    purrr,
+    testextra
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 6.1.1
+Suggests: 
+    testthat
