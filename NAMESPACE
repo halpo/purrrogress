@@ -3,6 +3,7 @@
 export(R6_progress)
 export(progress_bar)
 import(pkgcond)
+import(purrr)
 importFrom(assertthat,is.count)
 importFrom(assertthat,is.flag)
 importFrom(assertthat,is.number)

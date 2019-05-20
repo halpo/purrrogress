@@ -16,11 +16,12 @@ function( fun
     if (missing(total)) {
         calls <- sys.calls()
         frames <- sys.frames()
-        i <- max( in_purrr_map(calls, frames)
+        which <- seq.int(sys.nframe())
+        i <- max( in_purrr_map(which, calls=calls, frames=frames)
                 , in_apply_call(calls)
                 , in_call(c('group_map'))
                 )
-        if (length(i) && is.finite(i)) {
+        if (length(i) == 1 && is.finite(i) && i > 0) {
             if (getPackageName(frames[[i]]) == 'purrr')
                 return(with_purrr_progress(i, label=label, ..., fun=fun))
             call.symbols <- get_call_symbols(calls)

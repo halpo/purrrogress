@@ -1,9 +1,11 @@
+#' @import purrr
+NULL
+
 is_purrr_map_fun <-
 function( fun){
     bod <- as.list(body(fun))
     if('map' %in% all.names(body(fun), TRUE)) return(TRUE)
-    map_lgl( bod, ~is.call(.) && .[[1]] == ".Call" && grepl(".*map.*_impl", deparse(.[[2]]))
-           ) %>% any()
+    any(purrr::map_lgl( bod, ~is.call(.) && .[[1]] == ".Call" && grepl(".*map.*_impl", deparse(.[[2]]))))
 }
 
 is_purrr_map_call <- function(call){
@@ -48,26 +50,30 @@ if(FALSE){#@testing
 }
 
 in_purrr_map <-
-function( calls = sys.calls()
-        , frames = sys.frames()
+function( which = seq.int(sys.nframe())
+        , calls = sys.calls()[which]
+        , frames = sys.frames()[which]
         ){
-    i <- which(is_purrr_frame(frames))
-    if (any(i)) i <- i[purrr::map_lgl(calls[i], is_purrr_map_call)]
-    if (any(i)) i <- i[purrr::map(i, sys.function) %>% map_lgl(is_purrr_map_fun)]
+    assert_that( length(which) == length(calls)
+               , length(which) == length(frames)
+               )
+    i <- which[base::which(is_purrr_frame(frames))]
+    if (any(i)) i <- i[map_lgl(calls[i], is_purrr_map_call)]
+    if (any(i)) i <- i[map_lgl(map(i, sys.function), is_purrr_map_fun)]
     if(length(i)) max(i) else FALSE
 }
 if(FALSE){#@testing
-    vals <- purrr::map_lgl(1:2, function(x){
-        in_purrr_map( sys.calls()[sys.parent(1):sys.nframe()]
-                    , sys.frames()[sys.parent(1):sys.nframe()]
-                    ) == sys.parent()
+    vals <- purrr::map_lgl(1:1, function(x){
+        # which <- sys.parent(1):sys.nframe()
+        # calls <- sys.calls()[which]
+        # frames <- sys.frames()[which]
+        # in_purrr_map(which, calls, frames) == sys.parent(1)
+        in_purrr_map() == sys.parent(1)
     })
     expect_true(all(vals))
 
     v2 <- sapply(1:2, function(x)
-        in_purrr_map( sys.calls()[sys.parent(1):sys.nframe()]
-                    , sys.frames()[sys.parent(1):sys.nframe()]
-                    ) == sys.parent()
+        in_purrr_map( sys.parent(1):sys.nframe()) == sys.parent()
     )
     expect_false(any(v2))
 }
@@ -117,7 +123,7 @@ function( i = find_purrr_frame()
 if(FALSE){#@testing
     purrr::map_lgl(1:5, with_progress(test_progress_status, type='none')
                   , 5
-                  , "purrr::map\\(\\.\\.\\.\\)"
+                  , "purrr::map(...)"
                   , "\\d+/\\d+ items completed\\t(.+) remaining"
                   , class = "R6 Progress Base Class"
                   )

@@ -2,3 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
+
+# For testextra::extract_tests
+tests/testthat
