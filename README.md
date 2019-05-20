@@ -5,6 +5,10 @@
 
 <!-- badges: start -->
 
+[![Travis build
+status](https://travis-ci.org/halpo/purrrogress.svg?branch=master)](https://travis-ci.org/halpo/purrrogress)
+[![Codecov test
+coverage](https://codecov.io/gh/halpo/purrrogress/branch/master/graph/badge.svg)](https://codecov.io/gh/halpo/purrrogress?branch=master)
 <!-- badges: end -->
 
 The goal of purrrogress is to add as simply as possible progress bars to
