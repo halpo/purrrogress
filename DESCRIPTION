@@ -1,5 +1,5 @@
 Package: purrrogress
-Title: What the Package Does (One Line, Title Case)
+Title: Add progress bars to mapping functions
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Andrew",
@@ -20,5 +20,6 @@ Imports:
     testextra
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.1
+Language: en-US
 Suggests: 
     testthat

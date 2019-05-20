@@ -8,7 +8,7 @@
 <!-- badges: end -->
 
 The goal of purrrogress is to add as simply as possible progress bars to
-purrr mapping functions.
+[`purrr`](http://purrr.tidyverse.org) mapping functions.
 
 ## Installation
 
@@ -76,7 +76,7 @@ windows, Tk, or none(used for testing and demonstration).
 
 # Customization
 
-The progress bar windows can be customized to display relevent
+The progress bar windows can be customized to display relevant
 information such as the number of elements completed, or the estimated
 time remaining. This can be accomplished through inserting
 [glue](https://glue.tidyverse.org/) style keywords. These keywords are
@@ -117,8 +117,8 @@ pb$term()
 
 ## Adding Bindings
 
-In addition to those pre-specified additional bindings can be added to
-show even more information.
+In addition to those provided, additional bindings can be added to show
+even more information.
 
 ``` r
 words <- stringi::stri_rand_lipsum(1, FALSE) %>%
@@ -129,6 +129,10 @@ pb <- R6_progress$new( length(words)
                      , label = "Working on item {current}, {word}"
                      , bindings = list(word = ~words[pb$current+1])
                      )
+#> Warning in ls(self, all = TRUE): partial argument match of 'all' to
+#> 'all.names'
+#> Warning in ls(private$bindings, all = TRUE): partial argument match of
+#> 'all' to 'all.names'
 pb$init()
 pb$label
 #> Working on item 0, Maecenas
@@ -153,8 +157,8 @@ active bindings for titles and labels.
 The following are public methods for which a derived class **must**
 implement.
 
-  - **`init()`** - This is called at the begining of a loop or apply
-    function. It shouldcontain the code to actually create and show the
+  - **`init()`** - This is called at the beginning of a loop or apply
+    function. It should contain the code to actually create and show the
     progress bar window. Variables that are used to monitor and control
     the progress windows through other steps should be initialized here.
     It should additionally call `super$init()` to start timers. The
@@ -166,7 +170,7 @@ implement.
     The return value is expected to be `invisible(NULL)`.
   - **`update(...)`** - This takes any number of arguments which may be
     used to update internal variables or displays. This should handle
-    updating of the progress window, titles, lables, etc. The return
+    updating of the progress window, titles, labels, etc. The return
     value is expected to be `invisible(self)`.
 
 #### Other Public Methods
@@ -181,7 +185,7 @@ behavior.
     function the update any windows, titles and labels. The `n` argument
     is provided to allow for taking uneven steps. The `keep.open`
     argument is provided to allow for windows that stay open to show
-    relevent information, such as total time or average time per step.
+    relevant information, such as total time or average time per step.
     If `keep.open` is false (default) when the current counter reaches
     the total `term()` will be called.
   - **`initialize(...)`** - populates the initial values of `title`,
@@ -198,7 +202,7 @@ behavior.
 
 # Acknowledgements
 
-This project was insipred by a post to
+This project was inspired by a post to
 [R-Bloggers](https://www.r-bloggers.com/purrring-progress-bars-adding-a-progress-bar-to-purrrmap/)
 by Adi Sarid. Credit goes to him for the original idea on which
 `purrrogress` is built.
