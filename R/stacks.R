@@ -1,3 +1,6 @@
+#' @importFrom utils head tail
+NULL
+
 
 .pb.stacks <- new.env(hash = TRUE, parent = emptyenv())
 get_progress_stack <- function(stack, mode=c('any', 'list', 'environment')){
@@ -24,7 +27,7 @@ pop_progress <- function(stack = "progress_bars"){
     bars <- get_progress_stack(stack)
     if (length(bars) == 0) return()
     if (length(bars)) {
-        pb <- tail(bars, 1)[[1]]
+        pb <- utils::tail(bars, 1)[[1]]
         if (is(pb, "winProgressBar")){
             close(pb)
         } else if(is.environment(pb) && exists('term', envir = pb, inherits = FALSE)){

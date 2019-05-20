@@ -90,10 +90,8 @@ if(FALSE){#@testing in_purrr_map nested.
     })
 }
 
-
-
 with_purrr_progress <-
-function( i = find_purrr_frame()
+function( i = in_purrr_map()
         , title = NULL
         , ...
         , fun){

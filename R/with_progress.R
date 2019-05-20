@@ -1,11 +1,12 @@
+#' @import methods
+NULL
+
 #' Apply a function with progress bars.
 #'
 #' @param fun   The function to be apply
-#' @param total [Optional] the total number of items.
-#'              When omitted, a search will be performed to guess the
-#'              total.
-#' @param label The label to be displayed on the progress bar.
-#' @param ...   Other arguments to progress bar.
+#' @inheritParams progress_bar
+#'
+#' @export
 with_progress <-
 function( fun
         , total
@@ -55,7 +56,7 @@ if(FALSE){#@development
 }
 
 infer_type <- function(sysname){
-    switch( OS.type
+    switch( sysname
           , Windows = 'win'
           , 'tk'
           )

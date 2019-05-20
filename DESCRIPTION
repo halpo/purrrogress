@@ -7,17 +7,21 @@ Authors@R:
            role = c("aut", "cre"),
            email = "andrew.redd@hsc.utah.edu",
            comment = c(ORCID = "0000-0002-6149-2438"))
-Description: Easy progress bars for apply functions
+Description: Provides functions to easily add progress bars to 
+    apply calls.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: 
     R6, 
+    assertthat,
     glue,
-    pkgcond, 
     hms,
+    methods,
+    pkgcond, 
     purrr,
-    testextra
+    testextra,
+    utils
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.1
 Language: en-US

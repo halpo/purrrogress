@@ -26,7 +26,7 @@ function( total
         type <- match.arg(type)
         type <- switch( type
                       , win = R6_win_progress
-                      , tk  = R6_tk_progress
+                      , tk  = pkg_error('R6_tk_progress not implimented.')
                       , R6_progress
                       )
 

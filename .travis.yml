@@ -3,5 +3,18 @@
 language: R
 cache: packages
 
+r_packages:
+    - R6
+    - assert_that
+    - glue
+    - hms
+    - pkgcond
+    - purrr
+    - testextra
+
+before_script:
+  - Rscript -e 'testextra::extract_tests()'
+  - Rscript -e 'roxygen2::roxygenise(".", "rd")'
+
 after_success:
   - Rscript -e 'covr::codecov()'

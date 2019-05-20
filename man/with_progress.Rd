@@ -11,13 +11,15 @@ with_progress(fun, total,
 \arguments{
 \item{fun}{The function to be apply}
 
-\item{total}{\link{Optional} the total number of items.
-When omitted, a search will be performed to guess the
-total.}
+\item{total}{the total number of elements}
 
-\item{label}{The label to be displayed on the progress bar.}
+\item{label}{the label to display}
 
-\item{...}{Other arguments to progress bar.}
+\item{...}{passed on to the specific constructor determined by type.}
+
+\item{type}{the type of progress bar to create as a string, or an
+\code{R6ClassGenerator} object for a class that inherits from
+the "R6 Progress Base Class".}
 }
 \description{
 Apply a function with progress bars.
