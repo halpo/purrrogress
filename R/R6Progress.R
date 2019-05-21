@@ -120,6 +120,7 @@ R6_progress <- R6::R6Class("R6 Progress Base Class",
             round_hms(as.hms((proc.time() - private$.start.time.)['elapsed']/private$.current.*private$.total.), 1)
         },
         estimated.time.remaining = function(){
+            if (private$.current. == 0) return(hms::as.hms(NA_integer_))
             round_hms(as.hms(self$estimated.total.time - self$elapsed.time), 1)
         },
         etr = function(){self$estimated.time.remaining},
@@ -153,11 +154,12 @@ if(FALSE){#@testing
     expect_true(is.na(test$etr))
     expect_identical(test$init(), test)
     Sys.sleep(0.1)
-    expect_false(is.na(test$etr))
+    expect_true(is.na(test$etr))
     expect_equal(test$current, 0L)
 
     expect_identical(test$step(), test)
     expect_equal(test$current, 1L)
+    expect_false(is.na(test$etr))
 
 
     expect_equal(test$percent, "1%")
