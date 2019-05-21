@@ -157,6 +157,10 @@ if(FALSE){#@testing
     expect_identical(test$step(), test)
     expect_equal(test$current, 1L)
 
+
+    expect_equal(test$percent, "1%")
+    expect_null(test$term())
+
     words <- stringi::stri_rand_lipsum(1, FALSE) %>%
              stringi::stri_split(fixed = ' ') %>%
              unlist()
@@ -184,8 +188,6 @@ if(FALSE){#@testing
     at <- pb$average.time
     expect_is(at, 'hms')
     expect_true(at >= 1)
-
-    expect_equal(pb$percent, "1%")
 
     expect_error(pb$expose(i, overwrite = FALSE)
                 , class = "purrrogress-error-already-exists")
