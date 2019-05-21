@@ -111,10 +111,12 @@ R6_progress <- R6::R6Class("R6 Progress Base Class",
                 hms::round_hms(1)
         },
         average.time = function(){
+            if (private$.current. == 0) return(hms::as.hms(NA_integer_))
             ((proc.time() - private$.start.time.)['elapsed']/private$.current.) %>%
                 hms::as.hms() %>% hms::round_hms(1)
         },
         estimated.total.time = function(){
+            if (private$.current. == 0) return(hms::as.hms(NA_integer_))
             round_hms(as.hms((proc.time() - private$.start.time.)['elapsed']/private$.current.*private$.total.), 1)
         },
         estimated.time.remaining = function(){
