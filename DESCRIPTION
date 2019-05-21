@@ -30,6 +30,8 @@ Suggests:
     covr,
     datasets,
     dplyr,
-    testthat
+    stringi,
+    testthat,
+    tibble
 URL: https://github.com/halpo/purrrogress
 BugReports: https://github.com/halpo/purrrogress/issues

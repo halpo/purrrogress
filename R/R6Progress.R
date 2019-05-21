@@ -253,7 +253,7 @@ R6_win_progress <- R6::R6Class("R6 Windows Progress Bar",
         },
         init = function(){
             super$init()
-            if(is.null(private$.pb.) && elapsed.time > min.time)
+            if(is.null(private$.pb.) && self$elapsed.time > self$min.time)
                 private$.pb. <-
                     utils::winProgressBar( title = self$title
                                          , label = self$label
