@@ -43,8 +43,8 @@ function( fun
 if(FALSE){#@testing
     requireNamespace('dplyr')
     requireNamespace('tibble')
-    data(iris)
-    x <- dplyr::group_by(iris, Species)
+    requireNamespace('datasets')
+    x <- dplyr::group_by(datasets::iris, Species)
     test_group_map_progress <- function(df, key, ...){
         val <- test_progress_status( step = match(key$Species, unique(iris$Species)), ...)
         tibble::tibble(val)

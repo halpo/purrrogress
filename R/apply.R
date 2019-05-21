@@ -63,8 +63,6 @@ function( i = in_apply_call()
 with_apply_progress <-
 function(i = in_apply_call(), title=NULL, ..., fun){
     total <- get_apply_length(i)
-    stack <- get_progress_stack("with_progress", "environment")
-    set_progress_stack("with_progress", stack)
     if(is.null(title)){
         call <- sys.call(i)
         if (!is.name(call[[2]])) {

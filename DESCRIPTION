@@ -28,6 +28,7 @@ RoxygenNote: 6.1.1
 Language: en-US
 Suggests:
     covr,
+    datasets,
     dplyr,
     testthat
 URL: https://github.com/halpo/purrrogress
