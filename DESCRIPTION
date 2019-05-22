@@ -15,7 +15,6 @@ LazyData: true
 Imports: 
     R6, 
     assertthat,
-    dplyr,
     glue,
     hms,
     methods,
@@ -33,5 +32,7 @@ Suggests:
     stringi,
     testthat,
     tibble
+Enhances: 
+    dplyr
 URL: https://github.com/halpo/purrrogress
 BugReports: https://github.com/halpo/purrrogress/issues
