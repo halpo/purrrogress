@@ -1,6 +1,6 @@
 Package: purrrogress
 Title: Add progress bars to mapping functions
-Version: 0.0.1.0
+Version: 0.1.0
 Authors@R: 
     person(given = "Andrew",
            family = "Redd",

@@ -5,3 +5,4 @@
 ^\.covrignore$
 ^\.travis\.yml$
 ^codecov\.yml$
+^cran-comments\.md$
