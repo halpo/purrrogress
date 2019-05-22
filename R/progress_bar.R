@@ -27,6 +27,8 @@ function( total
         type <- switch( type
                       , win = R6_win_progress
                       , tk  = pkg_error('R6_tk_progress not implimented.')
+                      , txt =
+                      , bar = R6_box_progress
                       , R6_progress
                       )
 

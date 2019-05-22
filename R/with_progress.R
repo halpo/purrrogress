@@ -58,7 +58,7 @@ if(FALSE){#@development
 infer_type <- function(sysname){
     switch( sysname
           , Windows = 'win'
-          , 'tk'
+          , 'txt'
           )
 
 }

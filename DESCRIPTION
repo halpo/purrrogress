@@ -15,6 +15,7 @@ LazyData: true
 Imports: 
     R6, 
     assertthat,
+    dplyr,
     glue,
     hms,
     methods,
@@ -29,7 +30,6 @@ Language: en-US
 Suggests:
     covr,
     datasets,
-    dplyr,
     stringi,
     testthat,
     tibble

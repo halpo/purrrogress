@@ -124,7 +124,7 @@ R6_progress <- R6::R6Class("R6 Progress Base Class",
             round_hms(as.hms(self$estimated.total.time - self$elapsed.time), 1)
         },
         etr = function(){self$estimated.time.remaining},
-        percent = function(){sprintf("%d%%", round(private$.current./private$.total.*100))}
+        percent = function(){sprintf("%d%%", floor(private$.current./private$.total.*100))}
     )},
     private = {list(
         .title. = "Progress",
