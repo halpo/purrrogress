@@ -41,9 +41,11 @@ function( fun
     }
 }
 if(FALSE){#@testing
-    requireNamespace('dplyr')
-    requireNamespace('tibble')
-    requireNamespace('datasets')
+    if( requireNamespace('dplyr')
+      & requireNamespace('tibble')
+      & requireNamespace('datasets')
+      ){
+
     x <- dplyr::group_by(datasets::iris, Species)
     test_group_map_progress <- function(df, key, ...){
         val <- test_progress_status( step = match(key$Species, unique(iris$Species)), ...)
@@ -77,5 +79,6 @@ if(FALSE){#@testing
                            , title = "group_map\\(x, f, \\.\\.\\.\\)"
                            , label = "\\d/3 items completed")
     expect_true(all(val$val))
+    }
 }
 
