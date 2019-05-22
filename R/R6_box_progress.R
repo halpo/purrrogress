@@ -73,8 +73,14 @@ function( width
     } else pkg_error("Invalid value for charset$end"
                     , type="invalid value")
 
-    nf <- ceiling(nc) - nchar(char.position)
-    nb <- width - nchar(char.start) - nf  - nchar(char.position) - nchar(char.end)
+    nf <- min( floor(usable.width * pct - (nchar(char.start)*(!fixed.start)))
+             , usable.width - (nchar(char.end)*(!fixed.end)) - (nchar(char.end)*(!fixed.end))
+             )
+    nb <- max(0, width - nf
+               - nchar(char.start)
+               - nchar(char.position)
+               - nchar(char.end)
+               )
 
     paste0( char.start
           , strrep(char.fill, nf)
@@ -95,7 +101,6 @@ if(FALSE){#@testing
 
     val <- make_txt_progress_bar(20, 1, basic.charset)
     expect_equal(val, "|==================|")
-
 }
 
 
@@ -286,9 +291,9 @@ if(FALSE){#@testing
     get_char(8.3, line.charset$start)
 
     expected <- paste0('\u2523'
-                      , strrep('\u2501', 7)
-                      , '\u2578' #< heavy left
-                      , strrep(' ', 23-3-7)
+                      , strrep('\u2501', floor(23/3-1))
+                      , '\u2578' #< heavy left i.e. >= 50% of block
+                      , strrep(' ', 23-3-6)
                       , '\u2502'
                       )
     expect_equal(val, expected)
@@ -314,8 +319,9 @@ block.charset <-
                         , . == 1    ~ '\u2588'
                         ))
 if(FALSE){#@testing
-    expect_equal( make_txt_progress_bar(10, 9/80, block.charset)
-                , "\u2588\u258F        ")
+    val <- make_txt_progress_bar(10, 9/80, block.charset)
+    expect_equal(nchar(val), 10)
+    expect_equal( val, "\u2588\u258F        ")
     expect_equal( make_txt_progress_bar(10, 12/80, block.charset)
                 , "\u2588\u258C        ")
 }
