@@ -404,13 +404,30 @@ if(FALSE){#@testing
     expect_match( pb$label, "  0/160 {20}\\(0%\\) NA remaining")
     expect_output(pb$init(), "  0/160 {20}\\(0%\\) NA remaining")
 
-    expect_output( pb$step(), regexp = ".*  1/160<U\\+258F> {19}\\(0%\\) \\d\\d:\\d\\d:\\d\\d remaining")
-    expect_output( pb$step(), regexp = ".*  2/160<U\\+258E> {19}\\(1%\\) \\d\\d:\\d\\d:\\d\\d remaining")
-    expect_output( pb$step(), regexp = ".*  3/160<U\\+258D> {19}\\(1%\\) \\d\\d:\\d\\d:\\d\\d remaining")
-    expect_output( pb$step(), regexp = ".*  4/160| {19}\\(2%\\) \\d\\d:\\d\\d:\\d\\d remaining")
-    expect_output( pb$step(), regexp = ".*  5/160<U\\+258B> {19}\\(3%\\) \\d\\d:\\d\\d:\\d\\d remaining")
-    expect_output( pb$step(), regexp = ".*  6/160<U\\+258A> {19}\\(3%\\) \\d\\d:\\d\\d:\\d\\d remaining")
-    expect_output( pb$step(), regexp = ".*  7/160<U\\+2589> {19}\\(4%\\) \\d\\d:\\d\\d:\\d\\d remaining")
-    expect_output( pb$step(), regexp = ".*  8/160| {19}\\(4%\\) \\d\\d:\\d\\d:\\d\\d remaining")
-    expect_output( pb$step(), regexp = ".*  9/160|<U\\+258F> {18}\\(4%\\) \\d\\d:\\d\\d:\\d\\d remaining")
+    expect_output( pb$step())
+    expect_match(pb$label, regexp = "  1/160(\u258F) {19}\\(0%\\) \\d\\d:\\d\\d:\\d\\d remaining")
+
+    expect_output( pb$step())
+    expect_match(pb$label, regexp = "  2/160(\u258E) {19}\\(1%\\) \\d\\d:\\d\\d:\\d\\d remaining")
+
+    expect_output( pb$step())
+    expect_match(pb$label, regexp = "  3/160(\u258D) {19}\\(1%\\) \\d\\d:\\d\\d:\\d\\d remaining")
+
+    expect_output( pb$step())
+    expect_match(pb$label, regexp = "  4/160(\u258C) {19}\\(2%\\) \\d\\d:\\d\\d:\\d\\d remaining")
+
+    expect_output( pb$step())
+    expect_match(pb$label, regexp = "  5/160(\u258B) {19}\\(3%\\) \\d\\d:\\d\\d:\\d\\d remaining")
+
+    expect_output( pb$step())
+    expect_match(pb$label, regexp = "  6/160(\u258A) {19}\\(3%\\) \\d\\d:\\d\\d:\\d\\d remaining")
+
+    expect_output( pb$step())
+    expect_match(pb$label, regexp = "  7/160(\u2589) {19}\\(4%\\) \\d\\d:\\d\\d:\\d\\d remaining")
+
+    expect_output( pb$step())
+    expect_match(pb$label, regexp = "  8/160(\u2588) {19}\\(5%\\) \\d\\d:\\d\\d:\\d\\d remaining")
+
+    expect_output( pb$step())
+    expect_match(pb$label, regexp = "  9/160(\u2588\u258F) {18}\\(5%\\) \\d\\d:\\d\\d:\\d\\d remaining")
 }
