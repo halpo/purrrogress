@@ -75,6 +75,7 @@ function(i = in_apply_call(), title=NULL, ..., fun){
     }
     pb <- progress_bar(total = total, title=title, ...)
     push_progress(pb, 'with_progress')
+    pb$init()
     function(...){
         pb$update()
         on.exit(pb$step())
@@ -82,7 +83,9 @@ function(i = in_apply_call(), title=NULL, ..., fun){
     }
 }
 if(FALSE){#@testing
-    val <- sapply( 1:5, with_progress( test_progress_status, type="none")
+    val <- sapply( 1:5, with_progress( test_progress_status
+                                     , label="{frac} items completed"
+                                     , type="none")
                  , total=5
                  , title = "sapply"
                  , label = "\\d/5 items completed")

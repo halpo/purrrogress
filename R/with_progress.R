@@ -4,15 +4,43 @@ NULL
 #' Apply a function with progress bars.
 #'
 #' @param fun   The function to be apply
-#' @inheritParams progress_bar
+#' @param total The total number of elements to be mapped.
+#'              If ommitted an attempt will be made to infer the
+#'              correct number.
+#' @inheritDotParams progress_bar
 #'
 #' @export
+#' @examples
+#'
+#' # with purrr functions
+#' long_function <- function(x, how.long=0.05){
+#'     Sys.sleep(how.long)
+#'     x
+#' }
+#' purrr::walk(1:100, with_progress(long_function))
+#' purrr::walk2(1:100, 0.01, with_progress(long_function))
+#'
+#' # with dplyr::group_map
+#' if(require(dplyr)){
+#' group_function <- function(x, y, how.long=0.05){
+#'     Sys.sleep(how.long)
+#'     x
+#' }
+#' group_map( group_by(mtcars, cyl, gear)
+#'          , with_progress(group_function, type='line')
+#'          , how.long=1/3)
+#' group_walk( group_by_all(mtcars)
+#'           , with_progress(group_function, type='box')
+#'           , how.long=1)
+#' }
+#' # with standard apply functions
+#' sapply(1:100, with_progress(long_function, type='txt'))
+#'
+#'
 with_progress <-
 function( fun
         , total
-        , label = "{frac} items completed\t {etr} remaining"
         , ...
-        , type = infer_type(.Platform$OS.type)
         ){
     if (missing(total)) {
         calls <- sys.calls()
@@ -24,19 +52,20 @@ function( fun
                 )
         if (length(i) == 1 && is.finite(i) && i > 0) {
             if (getPackageName(frames[[i]]) == 'purrr')
-                return(with_purrr_progress(i, label=label, ..., fun=fun))
+                return(with_purrr_progress(i, ..., fun=fun))
             call.symbols <- get_call_symbols(calls)
             if (call.symbols[[i]] %in% base.apply.calls)
-                return(with_apply_progress(i, label=label, ..., fun=fun))
+                return(with_apply_progress(i, ..., fun=fun))
             if (call.symbols[[i]] == 'group_map')
-                return(with_progress_group_map(i, label=label, ..., fun=fun))
+                return(with_progress_group_map(i, ..., fun=fun))
         } else {
             stop("total is missing and could not find an appropriate" %<<%
                  "call to associate with progress bar.")
         }
     } else {
-        pb <- progress_bar(total = total, label=label, ...)
+        pb <- progress_bar(total = total, ...)
         push_progress(pb, "with_progress")
+        pb$init()
         function(...){
             pb$update()
             on.exit(pb$step())
@@ -52,13 +81,5 @@ if(FALSE){#@development
     }
 
     purrr::map_dbl(1:100, with_progress(f), 2)
-
-}
-
-infer_type <- function(sysname){
-    switch( sysname
-          , Windows = 'win'
-          , 'txt'
-          )
 
 }

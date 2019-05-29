@@ -19,7 +19,7 @@ R6_progress <- R6::R6Class("R6 Progress Base Class",
     public = {list(
         initialize = function( total
                              , title = "Progress"
-                             , label = "{frac}"
+                             , label = "{frac} items completed"
                              , initial = 0L
                              , ...
                              , bindings = list()
@@ -52,14 +52,14 @@ R6_progress <- R6::R6Class("R6 Progress Base Class",
             }
         },
         init = function(){
-            if (is.null(private$.start.time.))
-                private$.start.time. <- proc.time()
+            private$.start.time. <- proc.time()
+            private$.initialized. <- TRUE
             invisible(self)
         },
         term = function(){invisible(NULL)},
         update = function(...){},
         step = function(n=1L, ..., keep.open = FALSE){
-            self$init()
+            if (!private$.initialized.) self$init()
             private$.current. <- private$.current. + n
             if (keep.open || private$.current. < private$.total.)
                 self$update(...)
@@ -132,8 +132,7 @@ R6_progress <- R6::R6Class("R6 Progress Base Class",
         .total. = 0L,
         .current. = 0L,
         .start.time. = NULL,
-        .show.after. = 1L,
-        .min.time.needed.to.show. = 5L,
+        .initialized. = FALSE,
         bindings = NULL,
         .add_bindings = function(.list, overwrite=NA){
             purrr::imap(.list, self$add_binding, overwrite=overwrite)
@@ -149,7 +148,7 @@ if(FALSE){#@testing
     test <- R6_progress$new(100)
 
     expect_equal(test$title, "Progress")
-    expect_equal(test$label, "0/100")
+    expect_equal(test$label, "0/100 items completed")
 
     expect_true(is.na(test$etr))
     expect_identical(test$init(), test)
@@ -206,7 +205,6 @@ if(FALSE){#@testing
 
 
 # R6 Windows Progress Bar ==============================================
-# nocov start
 R6_win_progress <- R6::R6Class("R6 Windows Progress Bar",
     inherit = R6_progress,
     public  = list(
@@ -229,35 +227,43 @@ R6_win_progress <- R6::R6Class("R6 Windows Progress Bar",
             private$.final. <- label.final
             private$.width. <- as.integer(width)
             private$.show.after. <- show.after
-            private$.min.time.needed.to.show. <- min.time
-
-            if (private$.show.after. <= 0) self$init()
+            if (private$.show.after. <= 0){
+                private$.min.time.needed.to.show. <- 0L
+                self$init()
+            } else {
+                private$.min.time.needed.to.show. <- min.time
+            }
         },
+        # nocov start
         update = function(label, ...){
             if (!missing(label)){
                 assert_that(is.string(label))
                 self$.label. <<- label
             }
-            private$init()
             if (!is.null(private$.pb.))
                 if (private$.current. < private$.total.) {
                     utils::setWinProgressBar( pb = private$.pb.
                                             , value = private$.current.
-                                            , title = glue::glue(self$.title., .envir = self)
-                                            , label = glue::glue(self$.label., .envir = self)
+                                            , title = self$title
+                                            , label = self$label
                                             )
                 } else {
                     utils::setWinProgressBar( pb = private$.pb.
                                             , value = private$.total.
-                                            , title = glue::glue(private$.title., .envir = self)
-                                            , label = glue::glue(private$.final., .envir = self)
+                                            , title = self$title
+                                            , label = self$final
                                             )
                 }
             return(invisible(self))
         },
         init = function(){
             super$init()
-            if(is.null(private$.pb.) && self$elapsed.time > self$min.time)
+            if ( is.null(private$.pb.)
+               & self$elapsed.time >= private$.min.time.needed.to.show.
+               & ( is.na(self$estimated.total.time)
+                 | self$estimated.total.time >= private$.min.time.needed.to.show.
+                 )
+               )
                 private$.pb. <-
                     utils::winProgressBar( title = self$title
                                          , label = self$label
@@ -273,6 +279,7 @@ R6_win_progress <- R6::R6Class("R6 Windows Progress Bar",
             private$.pb. <- NULL
             invisible(NULL)
         }
+        # nocov end
     ),
     active = list(
         final = function()glue::glue(private$.final., .envir = self)
@@ -280,13 +287,14 @@ R6_win_progress <- R6::R6Class("R6 Windows Progress Bar",
     private = list(
         .pb. = NULL,
         .width. = 500,
-        .final.= "Finalizing"
+        .final.= "Finalizing",
+        .show.after. = 1L,
+        .min.time.needed.to.show. = 5L
     )
 )
-# nocov end
 
 # Testing --------------------------------------------------------------
-if(FALSE){#@ testing
+if(FALSE){#@testing
     words <- stringi::stri_rand_lipsum(1, FALSE) %>%
              stringi::stri_split(fixed = ' ') %>%
              unlist()
@@ -308,6 +316,14 @@ if(FALSE){#@ testing
 
     pb$init()
     pb$elapsed.time
+}
+if(FALSE){# Manual testing
+    debug(pb$init)
+    debug(pb$update)
+
+    pb$init()
 
 
+    pb <- R6_win_progress$new(100, show.after = 0)
+    pb$term()
 }

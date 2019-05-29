@@ -1,5 +1,5 @@
 Package: purrrogress
-Title: Add progress bars to mapping functions
+Title: Add Progress Bars to Mapping Functions
 Version: 0.1.0
 Authors@R: 
     person(given = "Andrew",

@@ -73,9 +73,9 @@ function( width
     } else pkg_error("Invalid value for charset$end"
                     , type="invalid value")
 
-    nf <- min( floor(usable.width * pct - (nchar(char.start)*(!fixed.start)))
-             , usable.width - (nchar(char.end)*(!fixed.end)) - (nchar(char.end)*(!fixed.end))
-             )
+    nf <- max(min( floor(usable.width * pct - (nchar(char.start)*(!fixed.start)))
+                 , usable.width - (nchar(char.end)*(!fixed.end)) - (nchar(char.end)*(!fixed.end))
+                 ), 0)
     nb <- max(0, width - nf
                - nchar(char.start)
                - nchar(char.position)
@@ -113,7 +113,7 @@ is_valid_charmap <- function(charmap){
     see_if( is.list(charmap)
           , all(are(charmap, 'formula'))
           , all(map_int(charmap, length)== 3)
-          , all(map_lgl(map(charmap, rlang::f_rhs), is.string()))
+          , all(map_lgl(map(charmap, rlang::f_rhs), is.string))
           , is.string(get_char(0, charmap))
           , is.string(get_char(1, charmap))
           )
@@ -134,12 +134,12 @@ is_valid_charset <- function(charset){
 }
 
 
-R6_box_progress <- R6::R6Class("R6 Box Drawing Progress Bar",
+R6_txt_progress <- R6::R6Class("R6 Text Progress Bar",
     inherit = R6_progress,
     public = {list(
         initialize = function( total
                              , title = ""
-                             , label = " ({frac})"
+                             , label = "{fwfrac}{bar}({percent}) {etr} remaining"
                              , ...
                              , width = getOption('width')
                              , charset=basic.charset
@@ -172,18 +172,23 @@ R6_box_progress <- R6::R6Class("R6 Box Drawing Progress Bar",
                 if(is.character(title) && nchar(title) > 0)
                     ensure_nl(title)
                 self$print_label()
+                flush.console()
             }
             invisible(self)
         },
         update = function(...){
             cat('\r')
+            flush.console()
             if (...length()>0)
                 cat(ensure_nl(paste0(...)))
             self$print_label()
+            flush.console()
             return(invisible(self))
         },
         term = function(){
+            self$update()
             cat('\n')
+            flush.console()
             invisible(NULL)
         },
         print_label = function(){
@@ -239,19 +244,17 @@ R6_box_progress <- R6::R6Class("R6 Box Drawing Progress Bar",
             console.width <- getOption('width')
             private$bar.width <- private$total.width - label.width
         }
-
     )}
 )
 if(FALSE){#@testing
-    pb <- R6_box_progress$new( 1000, title = "Test box progress"
+    pb <- R6_txt_progress$new( 1000, title = "Test text progress"
                              , label = "{fwfrac} {bar}({percent}) {etr} remaining"
                              , width = 50
                              )
 
-
     expect_equal(pb$fwfrac, "   0/1000")
-    expect_match(pb$bar, "| +|")
-    expect_equal(pb$title, "Test box progress")
+    expect_match(pb$bar, "\\| +\\|")
+    expect_equal(pb$title, "Test text progress")
     expect_equal( pb$label
                 , "   0/1000 |             |(0%) NA remaining"
                 )
@@ -266,8 +269,8 @@ if(FALSE){#@testing
 line.charset <-
     list( start = list( TRUE ~ '\u250A' #< dashed vertical
                       , . >= 0.25 ~ '\u2502' #< light vertical
-                      , . >= 0.25 ~ '\u2503' #< heavy vertical
-                      , . >= 0.50 ~ '\u2520' #< heavy vertical light right
+                      , . >= 0.50 ~ '\u2503' #< heavy vertical
+                      , . >= 0.75 ~ '\u2520' #< heavy vertical light right
                       , . >= 1.00 ~ '\u2523'
                       )
         , fill = '\u2501' #< heavy horizontal
@@ -306,6 +309,63 @@ if(FALSE){#@testing
                       )
     expect_equal(val, expected)
 }
+R6_line_progress <- R6::R6Class("R6 Line Drawing Progress",
+    inherit = R6_txt_progress,
+    public = list(
+        initialize = function(..., charset=line.charset)
+                        super$initialize(..., charset=charset)
+    )
+)
+if(FALSE){#@testing
+    pb <- R6_line_progress$new( 80, title = "Test line text progress"
+                              , label = "{fwfrac}{bar}({percent}) {etr} remaining"
+                              , width = 50
+                              )
+
+    expect_equal(pb$fwfrac, " 0/80")
+    expect_equal(pb$title, "Test line text progress")
+    expect_true(pb$bar=="\u250A                  \u2502")
+    expect_output(pb$init(), " 0/80(.*)\\(0%\\) NA remaining")
+
+    expect_output( pb$step(), regexp = ".* 1/80(.*)\\(1%\\) ([0-9:]{8}) remaining")
+    expect_true(pb$bar=="\u2502                  \u2502")
+
+    expect_output( pb$step(), regexp = ".* 2/80(.*)\\(2%\\) ([0-9:]{8}) remaining")
+    expect_true(pb$bar=="\u2503                  \u2502")
+
+    expect_output( pb$step(), regexp = ".* 3/80(.*)\\(3%\\) ([0-9:]{8}) remaining")
+    expect_true(pb$bar=="\u2520                  \u2502")
+
+    expect_output( pb$step(), regexp = ".* 4/80(.*)\\(5%\\) ([0-9:]{8}) remaining")
+    expect_true(pb$bar=="\u2523                  \u2502")
+
+    expect_output( pb$step(), regexp = ".* 5/80(.*)\\(6%\\) ([0-9:]{8}) remaining")
+    expect_true(pb$bar=="\u2523\u2574                 \u2502")
+
+    expect_output( pb$step(), regexp = ".* 6/80(.*)\\(7%\\) ([0-9:]{8}) remaining")
+    expect_true(pb$bar=="\u2523\u2578                 \u2502")
+
+    expect_output( pb$step(), regexp = ".* 7/80(.*)\\(8%\\) ([0-9:]{8}) remaining")
+    expect_true(pb$bar=="\u2523\u257E                 \u2502")
+
+    expect_output( pb$step(), regexp = ".* 8/80(.*)\\(10%\\) ([0-9:]{8}) remaining")
+    expect_true(pb$bar=="\u2523\u2501                 \u2502")
+
+    expect_output( pb$step(), regexp = ".* 9/80(.*)\\(11%\\) ([0-9:]{8}) remaining")
+    expect_true(pb$bar=="\u2523\u2501\u2574                \u2502")
+
+    expect_output(pb$step(67))
+    expect_true(pb$bar==paste0("\u2523", strrep("\u2501", 18), "\u2502"))
+
+    expect_output(pb$step())
+    expect_true(pb$bar==paste0("\u2523", strrep("\u2501", 18), "\u2524"))
+
+    expect_output(pb$step())
+    expect_true(pb$bar==paste0("\u2523", strrep("\u2501", 18), "\u2525"))
+
+    expect_output(pb$step())
+    expect_true(pb$bar==paste0("\u2523", strrep("\u2501", 18), "\u252B"))
+}
 
 block.charset <-
     list(position = list( TRUE ~ ' '
@@ -325,5 +385,32 @@ if(FALSE){#@testing
     expect_equal( make_txt_progress_bar(10, 12/80, block.charset)
                 , "\u2588\u258C        ")
 }
+R6_box_progress <- R6::R6Class("R6 Block Drawing Progress",
+    inherit = R6_txt_progress,
+    public = list(
+        initialize = function(..., charset=block.charset)
+                        super$initialize(..., charset=charset)
+    )
+)
+if(FALSE){#@testing
+    pb <- R6_box_progress$new( 160, title = "Test block box progress"
+                               , label = "{fwfrac}{bar}({percent}) {etr} remaining"
+                               , width = 52
+                               )
 
+    expect_equal(pb$fwfrac, "  0/160")
+    expect_match(pb$bar, " {20}")
+    expect_equal(pb$title, "Test block box progress")
+    expect_match( pb$label, "  0/160 {20}\\(0%\\) NA remaining")
+    expect_output(pb$init(), "  0/160 {20}\\(0%\\) NA remaining")
 
+    expect_output( pb$step(), regexp = ".*  1/160<U\\+258F> {19}\\(0%\\) \\d\\d:\\d\\d:\\d\\d remaining")
+    expect_output( pb$step(), regexp = ".*  2/160<U\\+258E> {19}\\(1%\\) \\d\\d:\\d\\d:\\d\\d remaining")
+    expect_output( pb$step(), regexp = ".*  3/160<U\\+258D> {19}\\(1%\\) \\d\\d:\\d\\d:\\d\\d remaining")
+    expect_output( pb$step(), regexp = ".*  4/160| {19}\\(2%\\) \\d\\d:\\d\\d:\\d\\d remaining")
+    expect_output( pb$step(), regexp = ".*  5/160<U\\+258B> {19}\\(3%\\) \\d\\d:\\d\\d:\\d\\d remaining")
+    expect_output( pb$step(), regexp = ".*  6/160<U\\+258A> {19}\\(3%\\) \\d\\d:\\d\\d:\\d\\d remaining")
+    expect_output( pb$step(), regexp = ".*  7/160<U\\+2589> {19}\\(4%\\) \\d\\d:\\d\\d:\\d\\d remaining")
+    expect_output( pb$step(), regexp = ".*  8/160| {19}\\(4%\\) \\d\\d:\\d\\d:\\d\\d remaining")
+    expect_output( pb$step(), regexp = ".*  9/160|<U\\+258F> {18}\\(4%\\) \\d\\d:\\d\\d:\\d\\d remaining")
+}

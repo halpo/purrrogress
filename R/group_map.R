@@ -34,6 +34,7 @@ function( fun
     # eval( quote(on.exit(.GlobalEnv$pop_progress(), add=TRUE))
     #     , frame
     #     )
+    pb$init()
     function(...){
         pb$update()
         on.exit(pb$step())
@@ -81,4 +82,17 @@ if(FALSE){#@testing
     expect_true(all(val$val))
     }
 }
+if(FALSE){# Manual Testing
+    x <- dplyr::group_by(datasets::iris, Species)
+    group_function <- function(df, keys, how.long=0.05){
+        Sys.sleep(how.long)
+        x
+    }
+    dplyr::group_walk( dplyr::group_by_all(iris)
+                     , with_progress(group_function, type="win", show.after=0)
+                     , how.long = 0.05
+                     )
+
+}
+
 

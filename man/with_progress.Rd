@@ -4,23 +4,52 @@
 \alias{with_progress}
 \title{Apply a function with progress bars.}
 \usage{
-with_progress(fun, total,
-  label = "{frac} items completed\\t {etr} remaining", ...,
-  type = infer_type(.Platform$OS.type))
+with_progress(fun, total, ...)
 }
 \arguments{
 \item{fun}{The function to be apply}
 
-\item{total}{the total number of elements}
+\item{total}{The total number of elements to be mapped.
+If ommitted an attempt will be made to infer the
+correct number.}
 
-\item{label}{the label to display}
-
-\item{...}{passed on to the specific constructor determined by type.}
-
-\item{type}{the type of progress bar to create as a string, or an
+\item{...}{Arguments passed on to \code{progress_bar}
+\describe{
+  \item{total}{the total number of elements}
+  \item{title}{the title of the progress bar}
+  \item{type}{the type of progress bar to create as a string, or an
 \code{R6ClassGenerator} object for a class that inherits from
 the "R6 Progress Base Class".}
+}}
 }
 \description{
 Apply a function with progress bars.
+}
+\examples{
+
+# with purrr functions
+long_function <- function(x, how.long=0.05){
+    Sys.sleep(how.long)
+    x
+}
+purrr::walk(1:100, with_progress(long_function))
+purrr::walk2(1:100, 0.01, with_progress(long_function))
+
+# with dplyr::group_map
+if(require(dplyr)){
+group_function <- function(x, y, how.long=0.05){
+    Sys.sleep(how.long)
+    x
+}
+group_map( group_by(mtcars, cyl, gear)
+         , with_progress(group_function, type='line')
+         , how.long=1/3)
+group_walk( group_by_all(mtcars)
+          , with_progress(group_function, type='box')
+          , how.long=1)
+}
+# with standard apply functions
+sapply(1:100, with_progress(long_function, type='txt'))
+
+
 }

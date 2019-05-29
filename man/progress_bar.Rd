@@ -4,15 +4,13 @@
 \alias{progress_bar}
 \title{Create a R6 progress bar directly}
 \usage{
-progress_bar(total, title = "Progress", label = "", ...,
-  type = c("none", "win", "tk"))
+progress_bar(total, title = "Progress", ...,
+  type = getOption("progress.type", infer_type()))
 }
 \arguments{
 \item{total}{the total number of elements}
 
 \item{title}{the title of the progress bar}
-
-\item{label}{the label to display}
 
 \item{...}{passed on to the specific constructor determined by type.}
 
@@ -22,4 +20,17 @@ the "R6 Progress Base Class".}
 }
 \description{
 Create a R6 progress bar directly
+}
+\examples{
+
+progress_bar(100, "Windows Progress", type = 'win')
+progress_bar(100, "Text Progress", type = 'txt')
+
+# The following use Unicode characters and may not work with all fonts.
+# DejaVu Sans Mono is one font which supports all the characters used
+progress_bar(100, "Bar Progress", type = 'bar')
+progress_bar(100, "Line Progress", type = 'line')
+progress_bar(100, "Box Progress", type = 'box')
+progress_bar(100, "Block Progress", type = 'block')
+
 }

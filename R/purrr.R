@@ -122,7 +122,7 @@ if(FALSE){#@testing
     purrr::map_lgl(1:5, with_progress(test_progress_status, type='none')
                   , 5
                   , "purrr::map(...)"
-                  , "\\d+/\\d+ items completed\\t(.+) remaining"
+                  , "\\d+/\\d+ items completed"
                   , class = "R6 Progress Base Class"
                   )
 
