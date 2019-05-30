@@ -10,7 +10,7 @@ with_progress(fun, total, ...)
 \item{fun}{The function to be apply}
 
 \item{total}{The total number of elements to be mapped.
-If ommitted an attempt will be made to infer the
+If omitted an attempt will be made to infer the
 correct number.}
 
 \item{...}{Arguments passed on to \code{progress_bar}

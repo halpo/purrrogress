@@ -5,7 +5,7 @@ NULL
 #'
 #' @param fun   The function to be apply
 #' @param total The total number of elements to be mapped.
-#'              If ommitted an attempt will be made to infer the
+#'              If omitted an attempt will be made to infer the
 #'              correct number.
 #' @inheritDotParams progress_bar
 #'
