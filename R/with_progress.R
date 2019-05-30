@@ -17,10 +17,13 @@ NULL
 #'     Sys.sleep(how.long)
 #'     x
 #' }
+#' \dontrun{
 #' purrr::walk(1:100, with_progress(long_function))
 #' purrr::walk2(1:100, 0.01, with_progress(long_function))
+#' }
 #'
 #' # with dplyr::group_map
+#' \dontrun{
 #' if(require(dplyr)){
 #' group_function <- function(x, y, how.long=0.05){
 #'     Sys.sleep(how.long)
@@ -33,8 +36,9 @@ NULL
 #'           , with_progress(group_function, type='box')
 #'           , how.long=1)
 #' }
+#' }
 #' # with standard apply functions
-#' sapply(1:100, with_progress(long_function, type='txt'))
+#' sapply(1:100, with_progress(long_function, type='txt'), 0.001)
 #'
 #'
 with_progress <-
