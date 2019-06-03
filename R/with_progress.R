@@ -17,13 +17,13 @@ NULL
 #'     Sys.sleep(how.long)
 #'     x
 #' }
-#' \dontrun{
+#' \donttest{
 #' purrr::walk(1:100, with_progress(long_function))
 #' purrr::walk2(1:100, 0.01, with_progress(long_function))
 #' }
 #'
 #' # with dplyr::group_map
-#' \dontrun{
+#' \donttest{
 #' if(require(dplyr)){
 #' group_function <- function(x, y, how.long=0.05){
 #'     Sys.sleep(how.long)
