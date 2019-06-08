@@ -305,6 +305,7 @@ if(FALSE){#@testing
              stringi::stri_split(fixed = ' ') %>%
              unlist()
 
+    i <- 1
     pb <-
         R6_win_progress$new( length(words)
                            , "Test Progress {current}/{total} ({estimated.time.remaining} remaining.)"
@@ -312,7 +313,6 @@ if(FALSE){#@testing
                            , width = 600
                            , bindings = list(word = ~words[i])
                            )
-    i <- 1
 
     expect_identical(pb$total, length(words))
     expect_identical(pb$current, 0L)
