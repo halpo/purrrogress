@@ -46,6 +46,7 @@ function( fun
         , total
         , ...
         ){
+    if(!rlang::is_function(fun)) fun <- rlang::as_function(fun, parent.frame())
     if (missing(total)) {
         calls <- sys.calls()
         frames <- sys.frames()

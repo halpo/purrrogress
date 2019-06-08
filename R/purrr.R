@@ -112,6 +112,7 @@ function( i = in_purrr_map()
     pb <- progress_bar(total = total, title=title, ...)
     push_progress(pb, "with_progress")
     eval(quote(on.exit(quote(.GlobalEnv$pop_progress("with_progress")))), sys.frame(i))
+    pb$init()
     function(...){
         pb$update()
         on.exit(pb$step())

@@ -52,8 +52,10 @@ R6_progress <- R6::R6Class("R6 Progress Base Class",
             }
         },
         init = function(){
-            private$.start.time. <- proc.time()
-            private$.initialized. <- TRUE
+            if(!private$.initialized.){
+                private$.start.time. <- proc.time()
+                private$.initialized. <- TRUE
+            }
             invisible(self)
         },
         term = function(){invisible(NULL)},
@@ -214,7 +216,7 @@ R6_win_progress <- R6::R6Class("R6 Windows Progress Bar",
                              , label.final = "Finalizing"
                              , initial = 0L
                              , width = 500L
-                             , show.after = 1 # Number of seconds to pass before showing progress bar.
+                             , show.after = 0 # Number of seconds to pass before showing progress bar.
                              , min.time = show.after * 5 # Show only if expected time (in seconds) is greater than max.time.
                              , ...
                              ){
@@ -240,6 +242,7 @@ R6_win_progress <- R6::R6Class("R6 Windows Progress Bar",
                 assert_that(is.string(label))
                 self$.label. <<- label
             }
+            self$show()
             if (!is.null(private$.pb.))
                 if (private$.current. < private$.total.) {
                     utils::setWinProgressBar( pb = private$.pb.
@@ -258,6 +261,15 @@ R6_win_progress <- R6::R6Class("R6 Windows Progress Bar",
         },
         init = function(){
             super$init()
+            self$show()
+            return(invisible(self))
+        },
+        term = function(){
+            if(!is.null(private$.pb.)) close(private$.pb.)
+            private$.pb. <- NULL
+            invisible(NULL)
+        },
+        show = function(){
             if ( is.null(private$.pb.)
                & self$elapsed.time >= private$.min.time.needed.to.show.
                & ( is.na(self$estimated.total.time)
@@ -272,12 +284,6 @@ R6_win_progress <- R6::R6Class("R6 Windows Progress Bar",
                                          , initial = private$.current.
                                          , width = private$.width.
                                          )
-            return(invisible(self))
-        },
-        term = function(){
-            if(!is.null(private$.pb.)) close(private$.pb.)
-            private$.pb. <- NULL
-            invisible(NULL)
         }
         # nocov end
     ),
