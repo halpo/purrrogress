@@ -312,6 +312,7 @@ if(FALSE){#@testing
                            , "{elapsed.time}/{estimated.total.time} estimated.\n {word}"
                            , width = 600
                            , bindings = list(word = ~words[i])
+                           , show.after=2
                            )
 
     expect_identical(pb$total, length(words))
