@@ -1,8 +1,67 @@
 #' @import purrr
 NULL
 
-is_purrr_map_fun <-
-function( fun){
+get_root_call_symbol <- function(call){
+    assert_that(is.call(call))
+    while (is.call(call)) {
+        if ( call[[1]] == '::'){
+            call <- call[[3]]
+        } else
+            call <- call[[1]]
+    }
+    return(call)
+}
+if(FALSE){
+    call <- substitute(purrr::pmap(list(letters, Letters), ~paste(.x, "->", .y)))
+    expect_identical(get_root_call_symbol(call), rlang::sym('pmap'))
+
+    call <- substitute(pmap(list(letters, Letters), ~paste(.x, "->", .y)))
+    expect_identical(get_root_call_symbol(call), rlang::sym('pmap'))
+}
+
+all_calls <- function(x){
+    if (is.function(x)) x<- body(x)
+    if(!any(map_lgl(as.list(x), is.call))) return(character(0))
+
+    calls <- keep(as.list(x), is.call)
+    c( as.character(map(calls, getElement, 1L))
+     , unlist(map(calls, all_calls))
+     )
+}
+if(FALSE){#@testing
+    fun <- purrr::imap
+    expect_equal( sort(all_calls(fun))
+                , c("`<-`", 'as_mapper', 'map2', 'vec_index'))
+}
+
+dot_calls <- function(fun, cfun){
+    calls <- keep(as.list(body(fun)), is.call)
+    if(!any(. <- as.character(map(calls, get_root_call_symbol)) == '.Call'))
+        return(FALSE)
+    any(as.character(map(calls[.], getElement, 2L)) %in% cfun)
+}
+if(FALSE){
+    fun <- purrr::pmap
+    cfun <- "pmap_impl"
+    expect_true(dot_calls(purrr::pmap, "pmap_impl"))
+    expect_false(dot_calls(purrr::pmap, "map_impl"))
+    expect_true(dot_calls(purrr::map, "map_impl"))
+}
+
+#' Check if a function is a map2 derived function
+#'
+#' Besides the obvious [map2] and `map2_*` variants,
+#' this also covers functions based off `map2`:
+#' * [imap] and `imap_*` variants.
+#' * [invoke_map] and `[invoke_map_*]` variants.
+#'
+#' @param fun function to test.
+is_purrr_map2_fun <- function(fun) dot_calls(fun, 'map2_impl')
+is_purrr_pmap_fun <- function(fun) dot_calls(fun, 'pmap_impl')
+is_purrr_map_fun  <- function(fun) dot_calls(fun, 'map_impl')
+
+is_any_purrr_map_fun <-
+function(fun){
     bod <- as.list(body(fun))
     if('map' %in% all.names(body(fun), TRUE)) return(TRUE)
     any(purrr::map_lgl( bod, ~is.call(.) && .[[1]] == ".Call" && grepl(".*map.*_impl", deparse(.[[2]]))))
@@ -59,8 +118,8 @@ function( which = seq.int(sys.nframe())
                )
     i <- which[base::which(is_purrr_frame(frames))]
     if (any(i)) i <- i[map_lgl(calls[i], is_purrr_map_call)]
-    if (any(i)) i <- i[map_lgl(map(i, sys.function), is_purrr_map_fun)]
-    if(length(i)) max(i) else FALSE
+    if (any(i)) i <- i[map_lgl(map(i, sys.function), is_any_purrr_map_fun)]
+    if (length(i)) max(i) else FALSE
 }
 if(FALSE){#@testing
     vals <- purrr::map_lgl(1:1, function(x){
@@ -96,8 +155,19 @@ function( i = in_purrr_map()
         , ...
         , fun){
     purrr.frame <- sys.frame(i)
-    stopifnot(exists('.x', envir = purrr.frame))
-    total <- length(get('.x', envir = purrr.frame))
+    sys.call(i)[[1]]
+
+    if (exists('.x', envir = purrr.frame)) {
+        if (exists('.y', envir = purrr.frame))
+            total <- max( length(get('.x', envir = purrr.frame))
+                        , length(get('.y', envir = purrr.frame))
+                        )
+        else
+            total <- length(get('.x', envir = purrr.frame))
+    } else
+    if (exists('.l', envir = purrr.frame)) {
+        total <- max(map_int(get('.l', envir=purrr.frame), length))
+    } else pkg_error("could not determine length.")
 
     if(is.null(title)){
         call <- sys.call(i)
@@ -137,4 +207,10 @@ if(FALSE){#@testing
                   , "this will take forever"
                   , class = "R6 Progress Base Class"
                   )
+
+    purrr::pmap_lgl(list(1:5), with_progress( test_progress_status, type='none'
+                                            , title = "pmap progress"
+                                            )
+                   , total = 5
+                   )
 }
