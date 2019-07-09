@@ -5,3 +5,6 @@
 
 # For testextra::extract_tests
 tests/testthat
+
+# Since documentation is generated dynamically on travis and for builds.
+man
