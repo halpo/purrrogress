@@ -12,7 +12,9 @@
 #' @export
 #' @examples
 #'
+#' \donttest{
 #' progress_bar(100, "Windows Progress", type = 'win')
+#' }
 #' progress_bar(100, "Text Progress", type = 'txt')
 #'
 #' # The following use Unicode characters and may not work with all fonts.

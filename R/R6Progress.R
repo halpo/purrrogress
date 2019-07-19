@@ -1,6 +1,5 @@
 #' @import pkgcond
 #' @importFrom assertthat is.flag is.string is.count is.number
-#' @importFrom hms as.hms round_hms
 #' @importFrom glue glue
 #' @importFrom testextra are
 NULL
@@ -109,21 +108,23 @@ R6_progress <- R6::R6Class("R6 Progress Base Class",
         current = function(){private$.current.},
         frac = function(){paste0(private$.current., '/', private$.total.)},
         elapsed.time=function(){
-            (proc.time() - private$.start.time.)['elapsed'] %>% hms::as.hms() %>%
+            (proc.time() - private$.start.time.)['elapsed'] %>%
+                as.numeric() %>%
+                hms::as_hms() %>%
                 hms::round_hms(1)
         },
         average.time = function(){
-            if (private$.current. == 0) return(hms::as.hms(NA_integer_))
-            ((proc.time() - private$.start.time.)['elapsed']/private$.current.) %>%
-                hms::as.hms() %>% hms::round_hms(1)
+            if (private$.current. == 0) return(hms::as_hms(NA_integer_))
+            as.numeric((proc.time() - private$.start.time.)['elapsed']/private$.current.) %>%
+                hms::as_hms() %>% hms::round_hms(1)
         },
         estimated.total.time = function(){
-            if (private$.current. == 0) return(hms::as.hms(NA_integer_))
-            round_hms(as.hms((proc.time() - private$.start.time.)['elapsed']/private$.current.*private$.total.), 1)
+            if (private$.current. == 0) return(hms::as_hms(NA_integer_))
+            hms::round_hms(hms::as_hms(as.numeric((proc.time() - private$.start.time.)['elapsed']/private$.current.*private$.total.)), 1)
         },
         estimated.time.remaining = function(){
-            if (private$.current. == 0) return(hms::as.hms(NA_integer_))
-            round_hms(as.hms(self$estimated.total.time - self$elapsed.time), 1)
+            if (private$.current. == 0) return(hms::as_hms(NA_integer_))
+            hms::round_hms(hms::as_hms(as.numeric(self$estimated.total.time - self$elapsed.time)), 1)
         },
         etr = function(){self$estimated.time.remaining},
         percent = function(){sprintf("%d%%", floor(private$.current./private$.total.*100))}
