@@ -52,7 +52,7 @@ if(FALSE){#@testing
     pb1$step()
     expect_equal(peek_progress('test stack')$current, 1L)
 
-    pb2 <- progress_bar(5, title = "sub-progress", type='win')
+    pb2 <- progress_bar(5, title = "sub-progress", type='none')
     push_progress(pb2, 'test stack')
 
     expect_identical(get_progress_stack('test stack'), list(pb1, pb2))

@@ -13,16 +13,20 @@
 #' @examples
 #'
 #' \donttest{
-#' progress_bar(100, "Windows Progress", type = 'win')
+#' pb_win <- progress_bar(100, "Windows Progress", type = 'win')
 #' }
-#' progress_bar(100, "Text Progress", type = 'txt')
+#' pb_txt <- progress_bar(100, "Text Progress", type = 'txt')
+#' pb_txt$init() # starts the timer and shows the bar.
+#' pb_txt$step() # take 1 step update progress bar.
+#' pb_txt$step(25) # take 24 steps at one time
+#' pb_txt$term() # do finishing tasks for progress bar.
 #'
 #' # The following use Unicode characters and may not work with all fonts.
 #' # DejaVu Sans Mono is one font which supports all the characters used
-#' progress_bar(100, "Bar Progress", type = 'bar')
-#' progress_bar(100, "Line Progress", type = 'line')
-#' progress_bar(100, "Box Progress", type = 'box')
-#' progress_bar(100, "Block Progress", type = 'block')
+#' pb_bar   <- progress_bar(100, "Bar Progress", type = 'bar')
+#' pb_line  <- progress_bar(100, "Line Progress", type = 'line')
+#' pb_box   <- progress_bar(100, "Box Progress", type = 'box')
+#' pb_block <- progress_bar(100, "Block Progress", type = 'block')
 #'
 progress_bar <-
 function( total
