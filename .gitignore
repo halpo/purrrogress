@@ -8,3 +8,7 @@ tests/testthat
 
 # Since documentation is generated dynamically on travis and for builds.
 man
+
+# one time use files.
+cran-comments.md
+CRAN-RELEASE
