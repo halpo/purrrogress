@@ -1,3 +1,8 @@
+# purrrogress 0.1.1
+
+* Bug fixes.
+* Examples updated.
+
 # purrrogress 0.1.0
 
 * Initial Release
