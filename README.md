@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# purrrogress
+# purrrogress <img src='man/figures/logo.svg' align="right" height="139" />
 
 <!-- badges: start -->
 
@@ -133,10 +133,6 @@ pb <- R6_progress$new( length(words)
                      , label = "Working on item {current}, {word}"
                      , bindings = list(word = ~words[pb$current+1])
                      )
-#> Warning in ls(self, all = TRUE): partial argument match of 'all' to
-#> 'all.names'
-#> Warning in ls(private$bindings, all = TRUE): partial argument match of
-#> 'all' to 'all.names'
 pb$init()
 pb$label
 #> Working on item 0, Maecenas

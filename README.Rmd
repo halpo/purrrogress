@@ -15,7 +15,7 @@ set.seed(20190520)
 library(purrr)
 library(purrrogress)
 ```
-# purrrogress
+# purrrogress <img src='man/figures/logo.svg' align="right" height="139" />
 
 <!-- badges: start -->
 [![Travis build status](https://travis-ci.org/halpo/purrrogress.svg?branch=master)](https://travis-ci.org/halpo/purrrogress)
